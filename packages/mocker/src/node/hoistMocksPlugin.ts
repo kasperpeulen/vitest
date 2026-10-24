@@ -4,6 +4,7 @@ import type { HoistMocksOptions, StaticMockCall } from './hoistMocks'
 import { createFilter } from 'vite'
 import { cleanUrl } from '../utils'
 import { hoistMocks } from './hoistMocks'
+import { isOptimizedDepFile } from './optimizedDeps'
 
 export interface HoistMocksPluginOptions extends Omit<HoistMocksOptions, 'regexpHoistable'> {
   include?: string | RegExp | (string | RegExp)[]
@@ -45,7 +46,7 @@ export function hoistMocksPlugin(options: HoistMocksPluginOptions = {}): Plugin 
       root = config.root
     },
     transform(code, id) {
-      if (!filter(id)) {
+      if (!filter(id) || isOptimizedDepFile(this.environment, id)) {
         return
       }
       const staticMocks: StaticMockCall[] = []
