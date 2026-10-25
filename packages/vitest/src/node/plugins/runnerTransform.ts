@@ -35,8 +35,7 @@ export function ModuleRunnerTransform(): VitePlugin {
           config.environments[name] ??= {}
 
           const environment = config.environments[name]
-          // other environments consumed by the browser are not run by Vitest
-          if (browserEnabled && name !== 'client' && environment.consumer === 'client') {
+          if (isRunByOthers(name, environment.consumer)) {
             continue
           }
           environment.dev ??= {}
@@ -59,14 +58,13 @@ export function ModuleRunnerTransform(): VitePlugin {
     configEnvironment: {
       order: 'post',
       handler(name, config) {
-        if (name === '__vitest__') {
+        if (name === '__vitest__' || isRunByOthers(name, config.consumer)) {
           return
         }
-        // In browser mode the `client` environment (and any other environment
-        // consumed by the browser) is browser-managed: don't apply node-runner
-        // externalization / `optimizeDeps` to it (that would discard the browser
-        // `optimizeDeps.include`, e.g. `vitest > expect-type`).
-        if (testConfig.browser?.enabled && (name === 'client' || config.consumer === 'client')) {
+        // In browser mode the `client` environment is browser-managed: don't
+        // apply node-runner externalization / `optimizeDeps` to it (that would
+        // discard the browser `optimizeDeps.include`, e.g. `vitest > expect-type`).
+        if (testConfig.browser?.enabled && name === 'client') {
           return
         }
 
@@ -94,4 +92,11 @@ export function ModuleRunnerTransform(): VitePlugin {
       },
     },
   }
+}
+
+// Vitest runs a client-consumed environment only as `client`: another one is
+// taken to be run by the browser in browser mode, and by the plugin that
+// defines it otherwise, so it keeps the config that plugin gave it.
+function isRunByOthers(name: string, consumer: 'client' | 'server' | undefined): boolean {
+  return name !== 'client' && name !== '__vitest_vm__' && consumer === 'client'
 }
