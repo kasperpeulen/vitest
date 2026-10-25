@@ -3,6 +3,7 @@ import type { Environment, Plugin, Rollup } from 'vite'
 import type { Expression, Positioned } from './esmWalker'
 import MagicString from 'magic-string'
 import { esmWalker } from './esmWalker'
+import { isOptimizedDepFile } from './optimizedDeps'
 
 const regexDynamicImport = /import\s*\(/
 
@@ -26,6 +27,9 @@ export function dynamicImportPlugin(options: DynamicImportPluginOptions = {}): P
           return
         }
         if (options.filter && !options.filter(id, this.environment)) {
+          return
+        }
+        if (isOptimizedDepFile(this.environment, id)) {
           return
         }
         return injectDynamicImport(source, id, this.parse, options)
