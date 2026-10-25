@@ -143,7 +143,13 @@ export function createExpectPoll(expect: ExpectStatic): ExpectStatic['poll'] {
               while (true) {
                 try {
                   const fnResult = await raceWith(
-                    Promise.resolve().then(() => fn({ signal: timeoutController.signal })),
+                    Promise.resolve().then(() =>
+                      fn({
+                        signal: timeoutController.signal,
+                        isNot: !!chai.util.flag(assertion, 'negate'),
+                        matcherName: String(key),
+                      }),
+                    ),
                     timeoutPromise,
                   )
                   if (!fnResult.ok) {

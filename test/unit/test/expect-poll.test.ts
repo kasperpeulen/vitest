@@ -190,3 +190,23 @@ test('unresolved assertion', async () => {
   ).rejects.toMatchInlineSnapshot(`[Error: expect.poll() assertion didn't resolve in time.]`)
   expect(aborted).toBe(true)
 })
+
+test('the callback gets the matcher it polls for', async () => {
+  const calls: unknown[] = []
+  await expect
+    .poll(({ isNot, matcherName }) => {
+      calls.push({ isNot, matcherName })
+      return 1
+    })
+    .toBe(1)
+  await expect
+    .poll(({ isNot, matcherName }) => {
+      calls.push({ isNot, matcherName })
+      return 1
+    })
+    .not.toBeNull()
+  expect(calls).toEqual([
+    { isNot: false, matcherName: 'toBe' },
+    { isNot: true, matcherName: 'toBeNull' },
+  ])
+})
