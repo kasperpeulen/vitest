@@ -23,7 +23,7 @@ When Vitest encounters the external library listed in `include`, it will be bund
 - Your `alias` configuration is now respected inside bundled packages
 - Code in your tests is running closer to how it's running in the browser
 
-Be aware that only packages in `deps.optimizer?.[mode].include` option are bundled (some plugins populate this automatically, like Svelte). You can read more about available options in [Vite](https://vitejs.dev/config/dep-optimization-options.html) docs (Vitest doesn't support `disable` and `noDiscovery` options). By default, Vitest uses `optimizer.client` for `jsdom` and `happy-dom` environments, and `optimizer.ssr` for `node` and `edge` environments.
+Be aware that only packages in `deps.optimizer?.[mode].include` option are bundled (some plugins populate this automatically, like Svelte). You can read more about available options in [Vite](https://vitejs.dev/config/dep-optimization-options.html) docs (Vitest doesn't support the `disable` option). By default, Vitest uses `optimizer.client` for `jsdom` and `happy-dom` environments, and `optimizer.ssr` for `node` and `edge` environments.
 
 This options also inherits your `optimizeDeps` configuration (for web Vitest will extend `optimizeDeps`, for ssr - `ssr.optimizeDeps`). If you redefine `include`/`exclude` option in `deps.optimizer` it will extend your `optimizeDeps` when running tests. Vitest automatically removes the same options from `include`, if they are listed in `exclude`.
 
@@ -37,6 +37,15 @@ You will not be able to edit your `node_modules` code for debugging, since the c
 - **Default:** `false`
 
 Enable dependency optimization.
+
+### deps.optimizer.{mode}.noDiscovery
+
+- **Type:** `boolean`
+- **Default:** `true`
+
+By default, Vitest bundles only the packages in `include`. Set to `false` to also bundle the dependencies Vite discovers as it transforms modules, as it does in dev. Vitest then keeps the environment's `optimizeDeps.entries` for the initial scan, and does not exclude `react` and `vue`: every dependency that imports them is bundled with them.
+
+This is useful when the environment needs its dependencies resolved with its own `resolve.conditions`, like a plugin that renders React Server Components in a test file and bundles `react` with the `react-server` condition.
 
 ## deps.client {#deps-client}
 

@@ -168,6 +168,13 @@ interface SequenceOptions {
 
 export type DepsOptimizationOptions = Omit<DepOptimizationConfig, 'disabled' | 'noDiscovery'> & {
   enabled?: boolean
+  /**
+   * Set to `false` to optimize the dependencies Vite discovers, as it does in dev,
+   * and not only those in `include`. Vitest then keeps the environment's
+   * `optimizeDeps.entries` and does not exclude `react` and `vue`.
+   * @default true
+   */
+  noDiscovery?: boolean
 }
 
 interface DepsOptions {

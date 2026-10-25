@@ -38,18 +38,21 @@ export function resolveOptimizerConfig(
       entries: [],
     }
   } else {
+    const discovery = testOptions.noDiscovery === false
     const currentInclude = testOptions.include || viteOptions?.include || []
     const exclude = [
       'vitest',
       // Ideally, we shouldn't optimize react in test mode, otherwise we need to optimize _every_ dependency that uses react.
-      'react',
-      'vue',
+      // With discovery, Vite does optimize every dependency it finds.
+      ...(discovery ? [] : ['react', 'vue']),
       ...(testOptions.exclude || viteOptions?.exclude || []),
     ]
-    const runtime = currentInclude.filter(
-      (n) => n.endsWith('jsx-dev-runtime') || n.endsWith('jsx-runtime'),
-    )
-    exclude.push(...runtime)
+    if (!discovery) {
+      const runtime = currentInclude.filter(
+        (n) => n.endsWith('jsx-dev-runtime') || n.endsWith('jsx-runtime'),
+      )
+      exclude.push(...runtime)
+    }
 
     const include = (testOptions.include || viteOptions?.include || []).filter(
       (n: string) => !exclude.includes(n),
@@ -58,9 +61,9 @@ export function resolveOptimizerConfig(
     optimizeDeps = {
       ...viteOptions,
       ...testOptions,
-      noDiscovery: true,
+      noDiscovery: !discovery,
       disabled: false,
-      entries: [],
+      entries: discovery ? (viteOptions?.entries ?? []) : [],
       exclude,
       include,
     }
