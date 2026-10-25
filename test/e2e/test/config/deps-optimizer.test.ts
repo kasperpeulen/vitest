@@ -55,3 +55,34 @@ test('deps.optimizer.web is deprecated only without a `web` environment', async 
   })
   expect(withEnvironment.stderr).not.toContain('`deps.optimizer.web` is deprecated')
 })
+
+test('deps.optimizer.{mode}.noDiscovery: false keeps discovery, entries and react', async () => {
+  const optimizeDeps = {
+    entries: ['test/**/*.test.tsx'],
+    include: ['react', 'react/jsx-runtime', 'some-dep'],
+  }
+  const $viteConfig = { environments: { client: { optimizeDeps } } }
+
+  const { config } = await resolveTestConfig({
+    deps: { optimizer: { client: { enabled: true, noDiscovery: false } } },
+    $viteConfig,
+  })
+  expect(config.environments.client.optimizeDeps).toMatchObject({
+    noDiscovery: false,
+    entries: ['test/**/*.test.tsx'],
+    include: ['react', 'react/jsx-runtime', 'some-dep'],
+    exclude: ['vitest'],
+  })
+
+  // without it, Vitest bundles only `include`, without react
+  const { config: defaults } = await resolveTestConfig({
+    deps: { optimizer: { client: { enabled: true } } },
+    $viteConfig,
+  })
+  expect(defaults.environments.client.optimizeDeps).toMatchObject({
+    noDiscovery: true,
+    entries: [],
+    include: ['some-dep'],
+    exclude: ['vitest', 'react', 'vue', 'react/jsx-runtime'],
+  })
+})
