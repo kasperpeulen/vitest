@@ -34,6 +34,14 @@ export async function runWithSuite(
   collectorContext.currentSuite = prev
 }
 
+/**
+ * How long an operation started now can wait and still fail before the running
+ * test or hook times out, or `undefined` if it has no timeout.
+ */
+export function getTimeLeft(): number | undefined {
+  return getRunner()._deadline?.derive()
+}
+
 export function withTimeout<T extends (...args: any[]) => any>(
   fn: T,
   timeout: number,

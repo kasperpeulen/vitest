@@ -26,6 +26,7 @@ import { vi } from '../../integrations/vi'
 import { createFileTask, getNames, getTestName, getTests } from '../../utils/tasks'
 import { createBench, kFinalize } from '../benchmark'
 import { rpc } from '../rpc'
+import { getTimeLeft } from '../runner/context'
 import { getFn, getHooks } from '../runner/map'
 import { createTaskCollector, getCurrentSuite } from '../runner/suite'
 import { getCurrentTest } from '../runner/test-state'
@@ -285,6 +286,7 @@ export class TestRunner implements VitestTestRunner {
   static createTaskCollector: typeof createTaskCollector = createTaskCollector
   static getCurrentSuite: typeof getCurrentSuite = getCurrentSuite
   static getCurrentTest: typeof getCurrentTest = getCurrentTest
+  static getTimeLeft: typeof getTimeLeft = getTimeLeft
   static createChainable: typeof createChainable = createChainable
   static getSuiteHooks: typeof getHooks = getHooks
   static getTestFn: typeof getFn = getFn

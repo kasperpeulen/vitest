@@ -362,3 +362,16 @@ describe('take care of the garden', () => {
 ```bash
 vitest ./garden/tasks.test.js
 ```
+
+## Time Left
+
+`TestRunner.getTimeLeft()` returns how long an operation started now can wait and still fail before the running test or hook times out, with a margin of 100 ms. It returns `undefined` if the test or hook has no timeout. An assertion or a locator that waits, like `expect.element()` of a third-party library, can use it as its default timeout, so its own error explains the failure rather than the test's timeout.
+
+```ts
+import { TestRunner } from 'vitest'
+
+function waitFor(condition: () => boolean, options: { timeout?: number } = {}) {
+  const timeout = options.timeout ?? TestRunner.getTimeLeft() ?? 1000
+  // ...
+}
+```

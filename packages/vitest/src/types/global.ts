@@ -27,12 +27,21 @@ declare module 'vitest' {
     message?: string
   }
 
+  interface ExpectPollContext {
+    /** Aborted when the poll times out. */
+    signal: AbortSignal
+    /** Whether the polled assertion is negated with `.not`. */
+    isNot: boolean
+    /** The matcher the value is polled for, like `toBeVisible`. */
+    matcherName: string
+  }
+
   interface ExpectStatic {
     assert: Chai.AssertStatic
     unreachable: (message?: string) => never
     soft: <T>(actual: T, message?: string) => Assertion<void, T>
     poll: <T>(
-      actual: (options: { signal: AbortSignal }) => T,
+      actual: (context: ExpectPollContext) => T,
       options?: ExpectPollOptions,
     ) => PromisifyAssertion<Awaited<T>>
     addEqualityTesters: (testers: Array<Tester>) => void
