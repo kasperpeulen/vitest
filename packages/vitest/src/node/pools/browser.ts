@@ -675,7 +675,7 @@ class BrowserWorker {
 
     // warm the transform cache while the iframe is booting so neither the
     // setup files nor the test file import waits for the transform; mirrors
-    // the URL the tester will request (see `importFile` in the browser runner)
+    // the URLs the tester will request (see `importFile` in the browser runner)
     for (const filepath of [...this.project.config.setupFiles, file.filepath]) {
       const url = `/${/^\w:/.test(filepath) ? '@fs/' : ''}${filepath}`.replace(/\/+/g, '/')
       void this.project.vite.transformRequest(url).catch(() => {})

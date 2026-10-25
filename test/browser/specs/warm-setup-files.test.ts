@@ -52,6 +52,7 @@ test('transforms the setup files before the tester imports them', async () => {
     }
   `)
   // the pool transforms the setup file while the tester is booting,
-  // not when the tester requests it
+  // and the tester's request reuses that transform
   expect(events[0]).toBe('transform')
+  expect(events.filter((event) => event === 'transform')).toHaveLength(1)
 })
