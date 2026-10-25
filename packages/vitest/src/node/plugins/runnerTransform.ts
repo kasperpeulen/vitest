@@ -94,9 +94,9 @@ export function ModuleRunnerTransform(): VitePlugin {
   }
 }
 
-// An environment consumed by a client, other than `client`, is not run by
-// Vitest: in browser mode the browser runs it, otherwise the plugin that
-// defines it does, so it keeps the config that plugin gave it.
+// Vitest runs a client-consumed environment only as `client`: another one is
+// taken to be run by the browser in browser mode, and by the plugin that
+// defines it otherwise, so it keeps the config that plugin gave it.
 function isRunByOthers(name: string, consumer: 'client' | 'server' | undefined): boolean {
   return name !== 'client' && name !== '__vitest_vm__' && consumer === 'client'
 }
