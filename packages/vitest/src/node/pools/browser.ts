@@ -673,14 +673,13 @@ class BrowserWorker {
     this.busySessions.add(sessionId)
     debug?.('[%s] run test %s', sessionId, file)
 
-    // warm the transform cache while the iframe is booting so the test
-    // file import doesn't wait for the transform; mirrors the URL the
-    // tester will request (see `importFile` in the browser runner)
-    const fileUrl = `/${/^\w:/.test(file.filepath) ? '@fs/' : ''}${file.filepath}`.replace(
-      /\/+/g,
-      '/',
-    )
-    void this.project.vite.transformRequest(fileUrl).catch(() => {})
+    // warm the transform cache while the iframe is booting so neither the
+    // setup files nor the test file import waits for the transform; mirrors
+    // the URL the tester will request (see `importFile` in the browser runner)
+    for (const filepath of [...this.project.config.setupFiles, file.filepath]) {
+      const url = `/${/^\w:/.test(filepath) ? '@fs/' : ''}${filepath}`.replace(/\/+/g, '/')
+      void this.project.vite.transformRequest(url).catch(() => {})
+    }
 
     this.setBreakpoint(sessionId, file.filepath)
       .then(() => {
